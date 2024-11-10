@@ -9,7 +9,8 @@ import RouteGaurd from "./components/route-gaurd/index";
 import InstructorDashbordPage from "./pages/Instructor";
 import NotFound from "./pages/notFound";
 import AddNewCoursePage from "./pages/Instructor/add-new-course";
-import StudentViewCoursePage from "./pages/courses";
+import StudentViewCoursePage from "./pages/student/courses";
+import StudentViewCourseDetailPage from "./pages/student/course-details";
 function App() {
   const { auth } = useContext(AuthContext);
   return (
@@ -70,7 +71,7 @@ function App() {
           
           <Route path="/home" element={<StudentHomePage />} />
           <Route path="/courses" element={<StudentViewCoursePage />} />
-
+          <Route path="/course/details/:id" element={<StudentViewCourseDetailPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

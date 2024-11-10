@@ -62,8 +62,8 @@ export const mediaBulkUploadService = async (files, onProgressCallback)=>{
     return res
 }
 
-export const fetchStudentViewCourseListService = async ()=>{
-    const res = await axiosInstance.get("/student/course/get");
+export const fetchStudentViewCourseListService = async (query)=>{
+    const res = await axiosInstance.get(`/student/course/get?${query}`);
     return res
 }
 export const fetchStudentViewCourseDetailsService = async (courseId)=>{
