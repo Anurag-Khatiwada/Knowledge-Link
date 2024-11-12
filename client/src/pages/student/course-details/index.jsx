@@ -1,10 +1,22 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import VideoPlayer from "@/components/video-player";
 import StudentContext from "@/context/student-context";
 import { fetchStudentViewCourseDetailsService } from "@/services";
-import { CheckCircle, Globe, Lock, PlayCircle } from "lucide-react";
-import React, { useContext, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Car, CheckCircle, Globe, Lock, PlayCircle } from "lucide-react";
+import React, { useContext, useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const StudentViewCourseDetailPage = () => {
   const {
@@ -16,12 +28,20 @@ const StudentViewCourseDetailPage = () => {
     setLoadingState,
   } = useContext(StudentContext);
 
+  const [displayCurrentVideoFreePreview, setDisplayCurrentVideoFreePreview] =
+    useState(null);
+  const [showFreePreviewDialog, setShowFreePreviewDialogue] = useState(false);
+
   const { id } = useParams();
+
+  const location = useLocation();
 
   const fetchCurrentCourseDetails = async (courseId) => {
     try {
       setLoadingState(true);
-      const courseDetails = await fetchStudentViewCourseDetailsService(courseId);
+      const courseDetails = await fetchStudentViewCourseDetailsService(
+        courseId
+      );
       if (courseDetails.data.success) {
         setStudentViewCourseDetails(courseDetails.data.data);
       } else {
@@ -47,8 +67,29 @@ const StudentViewCourseDetailPage = () => {
     }
   }, [currentCourseDetailsId]);
 
+  useEffect(() => {
+    if (!location.pathname.includes("course/details")) {
+      setStudentViewCourseDetails(null), setCurrentCourseDetailsId(null);
+    }
+  }, [location.pathname]);
+
   if (loadingState) return <Skeleton />;
 
+  const getIndexOfFreePreview =
+    studentViewCourseDetails !== null
+      ? studentViewCourseDetails?.curriculum?.findIndex(
+          (item) => item.freePreview
+        )
+      : -1;
+
+  console.log(studentViewCourseDetails?.curriculum[getIndexOfFreePreview]);
+  
+  const handelSetFreePreview = (curriculumItem) => {
+    console.log(curriculumItem);
+    setShowFreePreviewDialogue(true);
+    setDisplayCurrentVideoFreePreview(curriculumItem.videoUrl)
+  };
+  
   return (
     <div className="mx-auto p-4">
       <div className="bg-gray-900 text-white p-8 rounded-t-lg">
@@ -90,6 +131,16 @@ const StudentViewCourseDetailPage = () => {
               </ul>
             </CardContent>
           </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Course Description</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xl mt-4">
+                {studentViewCourseDetails?.description}
+              </p>
+            </CardContent>
+          </Card>
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="mb-3">Course Curriculum</CardTitle>
@@ -104,7 +155,8 @@ const StudentViewCourseDetailPage = () => {
                         ? "cursor-pointer"
                         : "cursor-not-allowed"
                     } flex items-center mb-4`}
-                  >
+                    onClick={curriculumItem?.freePreview ? () => handelSetFreePreview(curriculumItem) : undefined}
+                    >
                     {curriculumItem?.freePreview ? (
                       <PlayCircle className="mr-2 h-4 w-4" />
                     ) : (
@@ -117,7 +169,59 @@ const StudentViewCourseDetailPage = () => {
             </CardContent>
           </Card>
         </main>
+        <aside className="w-full md:w-[500px]">
+          <Card className="sticky top-4">
+            <CardContent className="p-6">
+              <div className="aspect-video mb-4 rounded-lg flex items-center justify-center">
+                <VideoPlayer
+                  url={
+                    getIndexOfFreePreview !== -1
+                      ? studentViewCourseDetails?.curriculum[
+                          getIndexOfFreePreview
+                        ].videoUrl
+                      : ""
+                  }
+                  width="450px"
+                  height="200px"
+                />
+              </div>
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-green-500">
+                  ${studentViewCourseDetails?.pricing}
+                </span>
+              </div>
+              <Button className="w-full">Buy Now</Button>
+            </CardContent>
+          </Card>
+        </aside>
       </div>
+      <Dialog 
+        open={showFreePreviewDialog}
+        onOpenChange={()=>{
+          setShowFreePreviewDialogue(null)
+          setDisplayCurrentVideoFreePreview(null)
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Course Preview</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center space-x-2">
+            <VideoPlayer className=''
+            url={displayCurrentVideoFreePreview}
+            width="400px"
+            height="200px"
+            />
+          </div>
+          <DialogFooter className="sm:justify-start">
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
