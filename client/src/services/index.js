@@ -70,3 +70,19 @@ export const fetchStudentViewCourseDetailsService = async (courseId)=>{
     const res = await axiosInstance.get(`student/course/get/details/${courseId}`);
     return res
 }
+
+export const createPaymentService = async(payload)=>{
+    const res = await axiosInstance.post(`/student/order/create`,payload);
+    return res
+}
+
+export const captureAndFinalizeService = async(paymentId, payerId, orderId)=>{
+    const res = await axiosInstance.post(`/student/order/finalize`,{
+        paymentId,payerId,orderId
+    });
+    return res
+}
+export const  fetchStudentBoughtCoursesService= async (studentId)=>{
+    const res = await axiosInstance.get(`/student/courses-bought/get/${studentId}`);
+    return res
+}

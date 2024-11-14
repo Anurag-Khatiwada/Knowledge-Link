@@ -6,6 +6,9 @@ const authRoutes = require('./routes/auth-routes/index');
 const mediaRoutes = require('./routes/instructor-routes/media-routes')
 const instructorCourseRoutes = require('./routes/instructor-routes/course-routtes')
 const studentCourseRoutes = require('./routes/student-routes/course-route')
+const studentViewOrderRotues = require('./routes/student-routes/order-routes')
+const studentCoursesRoutes = require('./routes/student-routes/student-courses-route');
+
 const app = express();
 
 // Apply CORS middleware correctly
@@ -29,6 +32,8 @@ app.use("/auth", authRoutes);
 app.use('/media', mediaRoutes);
 app.use('/instructor/course', instructorCourseRoutes);
 app.use('/student/course', studentCourseRoutes);
+app.use('/student/order', studentViewOrderRotues)
+app.use('/student/courses-bought',studentCoursesRoutes)
 
 // Error handling middleware (place this after routes)
 app.use((err, req, res, next) => {
