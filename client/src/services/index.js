@@ -66,8 +66,8 @@ export const fetchStudentViewCourseListService = async (query)=>{
     const res = await axiosInstance.get(`/student/course/get?${query}`);
     return res
 }
-export const fetchStudentViewCourseDetailsService = async (courseId)=>{
-    const res = await axiosInstance.get(`student/course/get/details/${courseId}`);
+export const fetchStudentViewCourseDetailsService = async (courseId, studentId)=>{
+    const res = await axiosInstance.get(`student/course/get/details/${courseId}/${studentId}`);
     return res
 }
 

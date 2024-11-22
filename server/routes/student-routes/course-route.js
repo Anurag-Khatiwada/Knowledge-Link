@@ -3,6 +3,6 @@ const {getAllStudentViewCoursesList, getStudentViewCourseDetails} = require('../
 const router = express.Router()
 
 router.get('/get', getAllStudentViewCoursesList);
-router.get('/get/details/:id',getStudentViewCourseDetails)
+router.get('/get/details/:id/:studentId',getStudentViewCourseDetails)
 
 module.exports = router

@@ -6,7 +6,7 @@ import StudentContext from "@/context/student-context";
 import { createPaymentService, fetchStudentViewCourseDetailsService } from "@/services";
 import { Car, CheckCircle, Globe, Lock, PlayCircle } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   Dialog,
   DialogClose,
@@ -35,26 +35,36 @@ const StudentViewCourseDetailPage = () => {
     useState(null);
   const [showFreePreviewDialog, setShowFreePreviewDialogue] = useState(false);
   const [approvalUrl, setApprovalUrl] = useState('')
+  const [coursePurchsedId, setCoursePurchsedId] = useState(null)
+
   const { id } = useParams();
 
   const location = useLocation();
+  const navigate = useNavigate()
 
   const fetchCurrentCourseDetails = async (courseId) => {
     try {
       setLoadingState(true);
       const courseDetails = await fetchStudentViewCourseDetailsService(
-        courseId
+        courseId,
+        auth?.user?._id
       );
       if (courseDetails.data.success) {
+        
         setStudentViewCourseDetails(courseDetails.data.data);
+        setCoursePurchsedId(courseDetails.data.coursePurchsedId);
+        setLoadingState(false);
       } else {
         setStudentViewCourseDetails(null);
+        setCoursePurchsedId(null);
+        setLoadingState(false);
+
       }
     } catch (err) {
       console.log(err);
-    } finally {
-      setLoadingState(false); // Ensure loading state is turned off even in case of an error
-    }
+    } 
+       // Ensure loading state is turned off even in case of an error
+ 
   };
 
   useEffect(() => {
@@ -77,6 +87,10 @@ const StudentViewCourseDetailPage = () => {
   }, [location.pathname]);
 
   if (loadingState) return <Skeleton />;
+
+  if(coursePurchsedId !== null ){
+    return <Navigate to={`/course-progress/${coursePurchsedId}`}/>
+  }
 
   const getIndexOfFreePreview =
     studentViewCourseDetails !== null
