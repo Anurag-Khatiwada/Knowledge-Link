@@ -66,8 +66,12 @@ export const fetchStudentViewCourseListService = async (query)=>{
     const res = await axiosInstance.get(`/student/course/get?${query}`);
     return res
 }
-export const fetchStudentViewCourseDetailsService = async (courseId, studentId)=>{
-    const res = await axiosInstance.get(`student/course/get/details/${courseId}/${studentId}`);
+export const fetchStudentViewCourseDetailsService = async (courseId)=>{
+    const res = await axiosInstance.get(`student/course/get/details/${courseId}`);
+    return res
+}
+export const checkCoursePurchaseInfoService = async (courseId, studentId)=>{
+    const res = await axiosInstance.get(`student/course/purchase-info/${courseId}/${studentId}`);
     return res
 }
 
@@ -85,4 +89,33 @@ export const captureAndFinalizeService = async(paymentId, payerId, orderId)=>{
 export const  fetchStudentBoughtCoursesService= async (studentId)=>{
     const res = await axiosInstance.get(`/student/courses-bought/get/${studentId}`);
     return res
+}
+
+export const getCurrentCourseProgressService = async (userId,courseId)=>{
+    const res = await axiosInstance.get(`student/course-progress/get/${userId}/${courseId}`);
+    return res
+}
+export async function markLectureAsViewedService(userId, courseId, lectureId) {
+    const { data } = await axiosInstance.post(
+      `/student/course-progress/mark-lecture-viewed`,
+      {
+        userId,
+        courseId,
+        lectureId,
+      }
+    );
+  
+    return data;
+  }
+  
+  export async function resetCourseProgressService(userId, courseId) {
+    const { data } = await axiosInstance.post(
+      `/student/course-progress/reset-progress`,
+      {
+        userId,
+        courseId,
+      }
+    );
+  
+    return data;
 }

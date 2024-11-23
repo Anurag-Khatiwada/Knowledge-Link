@@ -8,6 +8,8 @@ const instructorCourseRoutes = require('./routes/instructor-routes/course-routte
 const studentCourseRoutes = require('./routes/student-routes/course-route')
 const studentViewOrderRotues = require('./routes/student-routes/order-routes')
 const studentCoursesRoutes = require('./routes/student-routes/student-courses-route');
+const studentCourseProgressRoutes = require('./routes/student-routes/course-progress-route');
+
 
 const app = express();
 
@@ -34,6 +36,7 @@ app.use('/instructor/course', instructorCourseRoutes);
 app.use('/student/course', studentCourseRoutes);
 app.use('/student/order', studentViewOrderRotues)
 app.use('/student/courses-bought',studentCoursesRoutes)
+app.use('/student/course-progress', studentCourseProgressRoutes)
 
 // Error handling middleware (place this after routes)
 app.use((err, req, res, next) => {

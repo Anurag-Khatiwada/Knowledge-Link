@@ -2,8 +2,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { filterOptions, sortOptions } from '@/config'
+import { AuthContext } from '@/context/auth-context'
 import StudentContext from '@/context/student-context'
-import { fetchInstructorCourseListService } from '@/services'
+import { checkCoursePurchaseInfoService, fetchInstructorCourseDetailsService, fetchInstructorCourseListService } from '@/services'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
 import { ArrowUpDown } from 'lucide-react'
 import React, { useContext, useEffect, useState } from 'react'
@@ -14,7 +15,7 @@ const StudentViewCoursePage = () => {
     const [filter, setFilters] = useState({});
     const [searchParams, setSearchParams] = useSearchParams()
     const { studentViewCoursesList, setStudentViewCoursesList } = useContext(StudentContext);
-
+    const {auth} = useContext(AuthContext)
     const navigate = useNavigate()
 
     const createFilterParams = (filterParams) => {
@@ -99,6 +100,16 @@ const StudentViewCoursePage = () => {
         }
     }, [filter, sort]);
 
+    const handelCourseNavigate = async(courseId)=>{
+        const response = await checkCoursePurchaseInfoService(courseId, auth?.user?._id);
+        
+        if(response?.data?.data===true){
+            navigate(`/course-progress/${courseId}`)
+        }else{
+            navigate(`/course/details/${courseId}`)
+        }
+    }
+
 
     return (
         <div className='container mx-auto p-4'>
@@ -156,7 +167,7 @@ const StudentViewCoursePage = () => {
                     <div className="space-y-4">
                         {studentViewCoursesList && studentViewCoursesList.length > 0 ? (
                             studentViewCoursesList.map((courseItem) => (
-                                <Card onClick={()=>navigate(`/course/details/${courseItem?._id}`)} className='cursor-pointer' key={courseItem?._id}>
+                                <Card onClick={()=>handelCourseNavigate(courseItem?._id)} className='cursor-pointer' key={courseItem?._id}>
                                     <CardContent className='flex gap-4 p-4'>
                                         <div className="w-48 h-32 flex-shrink-0">
                                             <img

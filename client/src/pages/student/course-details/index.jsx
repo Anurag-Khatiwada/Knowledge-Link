@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import VideoPlayer from "@/components/video-player";
 import StudentContext from "@/context/student-context";
-import { createPaymentService, fetchStudentViewCourseDetailsService } from "@/services";
+import { checkCoursePurchaseInfoService, createPaymentService, fetchStudentViewCourseDetailsService } from "@/services";
 import { Car, CheckCircle, Globe, Lock, PlayCircle } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -18,6 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { AuthContext } from "@/context/auth-context";
+import { disableInstantTransitions } from "framer-motion";
 
 const StudentViewCourseDetailPage = () => {
   const {
@@ -35,28 +36,31 @@ const StudentViewCourseDetailPage = () => {
     useState(null);
   const [showFreePreviewDialog, setShowFreePreviewDialogue] = useState(false);
   const [approvalUrl, setApprovalUrl] = useState('')
-  const [coursePurchsedId, setCoursePurchsedId] = useState(null)
+  const [coursePurchased, setCoursePurchased] = useState(false)
 
   const { id } = useParams();
 
   const location = useLocation();
-  const navigate = useNavigate()
 
   const fetchCurrentCourseDetails = async (courseId) => {
     try {
       setLoadingState(true);
+
+      const checkCoursePurchasedInfo = await checkCoursePurchaseInfoService(courseId, auth?.user?._id);
+      if(checkCoursePurchasedInfo.data.data===true){
+        setCoursePurchased(true);
+
+      }
+
       const courseDetails = await fetchStudentViewCourseDetailsService(
         courseId,
-        auth?.user?._id
       );
       if (courseDetails.data.success) {
         
         setStudentViewCourseDetails(courseDetails.data.data);
-        setCoursePurchsedId(courseDetails.data.coursePurchsedId);
         setLoadingState(false);
       } else {
         setStudentViewCourseDetails(null);
-        setCoursePurchsedId(null);
         setLoadingState(false);
 
       }
@@ -87,10 +91,6 @@ const StudentViewCourseDetailPage = () => {
   }, [location.pathname]);
 
   if (loadingState) return <Skeleton />;
-
-  if(coursePurchsedId !== null ){
-    return <Navigate to={`/course-progress/${coursePurchsedId}`}/>
-  }
 
   const getIndexOfFreePreview =
     studentViewCourseDetails !== null
@@ -234,7 +234,7 @@ const StudentViewCourseDetailPage = () => {
                   ${studentViewCourseDetails?.pricing}
                 </span>
               </div>
-              <Button onClick={handleCreatePayment} className="w-full">Buy Now</Button>
+              <Button disabled={coursePurchased} onClick={handleCreatePayment} className="w-full">{coursePurchased===true?"You have already purchased this course":"Buy Now"}</Button>
             </CardContent>
           </Card>
         </aside>
