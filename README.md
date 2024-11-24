@@ -69,4 +69,7 @@ Potential improvements for the LMS include:
 ![lms8](https://github.com/user-attachments/assets/bf513ff6-d4e7-439c-8148-a48847c55cfe)
 ![lms 9](https://github.com/user-attachments/assets/281be798-a66c-4718-b151-ffc935fe1771)
 ![lms 10](https://github.com/user-attachments/assets/473921e8-a67f-4a25-aad6-fa7dcd639c14)
+![lms8](https://github.com/user-attachments/assets/b9e49e4a-6cb5-407c-b35d-7be3f1c19277)
+![lms9](https://github.com/user-attachments/assets/c5936df9-2bf5-4e61-a24c-7ae2aee995df)
+
 
