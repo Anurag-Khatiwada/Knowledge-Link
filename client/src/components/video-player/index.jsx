@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 import { Slider } from "@/components/ui/slider";
 import { Button } from '../ui/button';
 import { Pause, Play, RotateCcw, RotateCw, Volume2, VolumeX } from 'lucide-react';
 
-const VideoPlayer = ({ width = '100%', height = '100%', url }) => {
+const VideoPlayer = ({ width = '100%', height = '100%', url, onProgressUpdate, progressData }) => {
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [muted, setMuted] = useState(false);
@@ -23,6 +23,9 @@ const VideoPlayer = ({ width = '100%', height = '100%', url }) => {
       setPlayed(progress.played);
     }
   };
+  const handleDuration = (duration) => {
+    setPlayed(duration); // Update video duration
+  };
 
   const handleRewind = () => {
     const currentTime = playerRef.current.getCurrentTime();
@@ -37,6 +40,15 @@ const VideoPlayer = ({ width = '100%', height = '100%', url }) => {
   const handleToggleMute = () => {
     setMuted(!muted);
   };
+
+  useEffect(() => {
+    if(played===1){
+      onProgressUpdate({
+        ...progressData,
+        progressValue: played
+      })
+    }
+  }, [played]);
 
   return (
     <div
@@ -55,6 +67,7 @@ const VideoPlayer = ({ width = '100%', height = '100%', url }) => {
             volume={volume}
             muted={muted}
             onProgress={handleProgress}
+            onDuration={handleDuration}
             controls
           />
           {/* <div className="absolute bottom-0 left-0 right-0 bg-gray-800 bg-opacity-75 p-4">

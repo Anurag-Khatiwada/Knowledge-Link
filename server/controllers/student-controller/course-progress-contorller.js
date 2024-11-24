@@ -2,7 +2,7 @@ const CourseProgress = require('../../models/courseProgress');
 const Course = require('../../models/Course');
 const StudentCourses = require('../../models/StudentCourses');
 
-//mark current lecture as viewed
+// Mark current lecture as viewed
 const markCurrentLectureAsViewed = async (req, res) => {
     try {
         const { userId, courseId, lectureId } = req.body;
@@ -63,7 +63,6 @@ const markCurrentLectureAsViewed = async (req, res) => {
         if (allLecturesViewed) {
             progress.completed = true;
             progress.completionDate = new Date();
-
             await progress.save();
         }
 
@@ -81,9 +80,7 @@ const markCurrentLectureAsViewed = async (req, res) => {
     }
 };
 
-
-
-//get current course progress
+// Get current course progress
 const getCurrentCourseProgress = async (req, res) => {
     try {
         const { userId, courseId } = req.params;
@@ -151,8 +148,7 @@ const getCurrentCourseProgress = async (req, res) => {
     }
 };
 
-
-//reset course progress
+// Reset course progress
 const resetCurrentCourseProgress = async (req, res) => {
     try {
         const { userId, courseId } = req.body;
@@ -193,9 +189,8 @@ const resetCurrentCourseProgress = async (req, res) => {
     }
 };
 
-
 module.exports = {
     markCurrentLectureAsViewed,
     getCurrentCourseProgress,
-    resetCurrentCourseProgress
-}
+    resetCurrentCourseProgress,
+};

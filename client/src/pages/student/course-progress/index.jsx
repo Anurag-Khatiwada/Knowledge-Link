@@ -5,7 +5,7 @@ import VideoPlayer from "@/components/video-player";
 import { AuthContext } from '@/context/auth-context';
 import StudentContext from '@/context/student-context';
 import { getCurrentCourseProgressService, markLectureAsViewedService, resetCourseProgressService } from '@/services';
-import { Check, ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import {Check, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import Confetti from 'react-confetti';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -39,29 +39,30 @@ const StudentViewCourseProgressPage = () => {
             progress: response?.data?.data?.progress,
           });
 
-          if (response?.data?.completed) {
-            setCurrentLecture(response?.data?.data?.courseDetails?.curriculum[0]);
+          const courseDetails = response?.data?.data?.courseDetails;
+
+          if (response?.data?.data?.completed) {
+            setCurrentLecture(courseDetails?.curriculum[0]);
             setShowCourseCompleteDialogue(true);
             setShowConfetti(true);
             return;
           }
 
           if (response?.data?.data?.progress?.length === 0) {
-            setCurrentLecture(response?.data?.data?.courseDetails?.curriculum[0]);
+            setCurrentLecture(courseDetails?.curriculum[0]);
           } else {
             const lastIndexOfViewedAsTrue = response?.data?.data?.progress.reduceRight(
               (acc, obj) => acc === -1 && obj.viewed ? obj._id : acc,
               -1
             );
 
-            setCurrentLecture(
-              response?.data?.data?.courseDetails?.curriculum[
-                lastIndexOfViewedAsTrue + 1
-              ]
-            );
+            courseDetails?.curriculum[lastIndexOfViewedAsTrue + 1] 
+            ? setCurrentLecture(courseDetails?.curriculum[lastIndexOfViewedAsTrue + 1])
+            : setCurrentLecture(courseDetails?.curriculum[0]);
           }
         }
       }
+      console.log(response)
     } catch (error) {
       console.error("Error fetching course progress:", error);
     } finally {
@@ -77,8 +78,9 @@ const StudentViewCourseProgressPage = () => {
           studentCurrentCourseProgress?.courseDetails?._id,
           currentLecture._id
         );
+
         if (response?.data?.success) {
-          fetchCurrentCourseProgress();
+          fetchCurrentCourseProgress(); // Fetch updated progress
         }
       } catch (error) {
         console.error("Error marking lecture as viewed:", error);
@@ -93,11 +95,11 @@ const StudentViewCourseProgressPage = () => {
         auth?.user?._id,
         studentCurrentCourseProgress?.courseDetails?._id
       );
-      if (response?.success) {
+      if (response?.data?.success) {
         setCurrentLecture(null);
         setShowConfetti(false);
         setShowCourseCompleteDialogue(false);
-        fetchCurrentCourseProgress();
+        fetchCurrentCourseProgress(); // Reset course progress and re-fetch
       }
     } catch (error) {
       console.error("Error resetting course progress:", error);
@@ -110,13 +112,16 @@ const StudentViewCourseProgressPage = () => {
 
   useEffect(() => {
     if (currentLecture?.progressValue === 1) {
-      updateCourseProgress();
+      updateCourseProgress(); // Mark the lecture as viewed when completed
     }
   }, [currentLecture]);
 
   useEffect(() => {
     if (showConfetti) setTimeout(() => setShowConfetti(false), 5000);
   }, [showConfetti]);
+
+  console.log(currentLecture)
+  console.log(showCourseCompleteDialogue)
 
   return (
     <div className="flex flex-col h-screen bg-[#1c1d1f] text-white">
@@ -172,10 +177,10 @@ const StudentViewCourseProgressPage = () => {
         >
           <Tabs defaultValue="content" className="h-full flex flex-col">
             <TabsList className="grid bg-[#676b72] w-full grid-cols-2 p-0 h-14">
-              <TabsTrigger value="content" className=" text-black rounded-none h-full">
+              <TabsTrigger value="content" className="text-black rounded-none h-full">
                 Course Content
               </TabsTrigger>
-              <TabsTrigger value="overview" className=" text-black rounded-none h-full">
+              <TabsTrigger value="overview" className="text-black rounded-none h-full">
                 Overview
               </TabsTrigger>
             </TabsList>
@@ -215,24 +220,13 @@ const StudentViewCourseProgressPage = () => {
         </div>
       </div>
 
-      {/* Course Complete Dialog */}
-      <Dialog open={showCourseCompleteDialogue} onOpenChange={setShowCourseCompleteDialogue}>
+      <Dialog open={showCourseCompleteDialogue} onOpenChange={() => setShowCourseCompleteDialogue(false)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Congratulations, you've completed the course!</DialogTitle>
-            <DialogDescription>Well done! You have completed all the lessons.</DialogDescription>
+            <DialogTitle>Course Completed</DialogTitle>
+            <DialogDescription>Congratulations! You've completed the course!</DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end space-x-2">
-            <Button onClick={handleRewatchCourse} className="bg-[#2d72d9]">
-              Rewatch Course
-            </Button>
-            <Button
-              onClick={() => setShowCourseCompleteDialogue(false)}
-              className="bg-[#2d72d9]"
-            >
-              Close
-            </Button>
-          </div>
+          <Button onClick={handleRewatchCourse}>Rewatch Course</Button>
         </DialogContent>
       </Dialog>
     </div>
@@ -240,4 +234,3 @@ const StudentViewCourseProgressPage = () => {
 };
 
 export default StudentViewCourseProgressPage;
-
